@@ -1,4 +1,6 @@
-from covar_sym import CVModel
+from covar_sim import CVModel
+from random import seed
+from csv import writer
 
 #ys = 	[1,1,2,1,8,9,6,7,4,3,0,4,1,0,2,2,3]	# ds1 data set fcs in intervals
 if True:
@@ -10,9 +12,8 @@ else:
 			[1.3, 17.8, 5.0, 1.5, 1.5, 3.0, 3.0, 8, 30, 9, 25, 15, 15, 2], # fVec
 			[0.5, 2.8, 1, 0.5, 0.5, 1, 0.5, 2.5, 3.0, 3.0, 6, 4, 4, 1]	] # cVec
 
-b, w, beta = var('b'), var('w'), symbols('beta:3')
 
-random.seed(1)
+seed(1)
 
 
 
@@ -26,28 +27,17 @@ covar = CVModel(	model = "GM",
 print(sum([covar.pr(i) for i in range(covar.length)]))
 covar.gen_defects()
 print(covar.LL())
-print(covar.RLL())
 print(covar.fcs)
 print(f'Cummulative FC is: {sum(covar.fcs)}')
 #print(covar.LL().subs(b, 0.5))
 
 
-import csv
-from itertools import zip_longest
 
-t = list(range(1,covar.length+1))
-d = [t, covar.fcs]
-headers = ["T", "FC"]
-ascii = 65
-
-for idx in range(len(covar.covariates)):
-	d.append(xs[idx])
-	headers.append(chr(ascii))
-	ascii += 1
-
-export_data = zip_longest(*d, fillvalue = '')
-with open('poiss_sym.csv', 'w', encoding="ISO-8859-1", newline='') as myfile:
-      wr = csv.writer(myfile)
-      wr.writerow(headers)
-      wr.writerows(export_data)
+with open('poiss_sym.csv', 'w') as myfile:
+	wr = writer(myfile)
+	wr.writerow(['T', 'FC'] + [f'x{i+1}' for i in range(len(covar.covariates))])
+	wr.writerows(zip(
+		range(1,covar.length+1),
+		covar.fcs,
+		*covar.covariates))
 myfile.close()
