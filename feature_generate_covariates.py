@@ -1,5 +1,6 @@
 from covar_sim import CVModel
 from sympy import exp, prod, log, var, symbols, N, factorial
+from random import seed
 
 
 #ys = 	[1,1,2,1,8,9,6,7,4,3,0,4,1,0,2,2,3]	# ds1 data set fcs in intervals
@@ -14,41 +15,33 @@ else:
 
 b, w, beta = var('b'), var('w'), symbols('beta:3')
 
-random.seed(1)
+seed(1)
 
-
-def sim_pr_fn(self, i, b = 5, tot = False):	# basic exponential shape from 0 to 1
+		# IMPORTANT
+		# don't do this - it generates a exponential curve and changes the height and size so that the total of all
+		# n samples is 1. while this works the correct way to generate covariate data should be probabilistically, not 
+		# via solving
+def sim_pr_fn(i, b = 5, tot = False):	# basic exponential shape from 0 to 1
 	return (exp(b*i) - exp(-b)) / (1 - exp(-b))
 
-def sim_pr_solve(self, x, count):
+def sim_pr_solve(x, count):
 	samples = [self.sim_pr_fn(i/count - 1)*x for i in range(count)]
 	return float(sum(samples) - 1)
 
-def sim_pr(self, count):
+def sim_pr(count):
 	val = root(self.sim_pr_solve, 1, method='hybr', tol=1e-10, args=(count))
 	samples = [self.sim_pr_fn(i/count - 1)*val.x for i in range(count)]
 	plt.scatter(range(1, count+1),samples)
 
 
 
-covar = CVModel(	model = "NB",
-					params = [0.0262],
-					covariates = xs,
-					omega = 55.1228,
-					betas = [0.2177, 0.0313, 0.1770])
-covar.sim_pr(17)
-
-'''
 covar = CVModel(	model = "GM",
 					params = [0.01],
 					covariates = xs,
 					omega = 55.1228,
-					betas = [0.2177, 0.0313, 0.1770])'''
+					betas = [0.2177, 0.0313, 0.1770])
 
-plt.scatter(range(1,covar.length+1), [covar.pr(i) for i in range(covar.length)])
-plt.show()
 
-#covar.gen_defects()
-#print(covar.LL())
-#print(covar.fcs)
-#print(covar.LL().subs(b, 0.5))
+
+sim_pr(17)
+

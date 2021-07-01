@@ -1,9 +1,8 @@
 import random, sys
 from sympy import exp, prod, log, var, symbols, N, factorial
-from scipy.optimize import root
+
 
 class CVModel():
-
 
 	def poiss(self, lamb):
 		# knuth's method for random poisson variate (ideal up to ~30)
